@@ -10,5 +10,8 @@ data class VideosApi(
 
 @JsonClass(generateAdapter = true)
 data class VideoApi(
-    @Json(name = "id") val videoId: Int
+    @Json(name = "id") val videoId: Int,
+    @Json(name = "duration") val videoDuration: Int,
+    @Json(name = "url") val videoUrl: String,
+    @Json(name = "image") val videoImage: String
 )

@@ -17,7 +17,11 @@ class ListVideoRepositoryImpl @Inject constructor(
                 Result.Success(
                     result.data.videos.map {
                         VideoDomain(
-                            videoId = it.videoId
+                            videoId = it.videoId,
+                            videoDuration = it.videoDuration,
+                            videoUrl = it.videoUrl,
+                            videoName = it.videoUrl.split("/video/")[1].substringBeforeLast("-").replace("-", " "),
+                            videoImage = it.videoImage
                         )
                     }
                 )
