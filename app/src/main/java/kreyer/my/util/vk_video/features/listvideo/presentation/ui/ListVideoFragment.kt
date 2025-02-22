@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kreyer.my.util.vk_video.databinding.FragmentListVideoBinding
 import kreyer.my.util.vk_video.features.di.AdapterModule
+import kreyer.my.util.vk_video.features.listvideo.presentation.event.ReloadGetListOfVideos
 import kreyer.my.util.vk_video.features.listvideo.presentation.model.VideoUi
 import kreyer.my.util.vk_video.features.listvideo.presentation.ui.recyclerview.VideoAdapter
 import kreyer.my.util.vk_video.features.listvideo.presentation.vm.ListVideoViewModel
@@ -55,6 +56,7 @@ class ListVideoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpRecyclerView()
         observerFlow()
+        observerButton()
     }
 
     private fun setUpRecyclerView() {
@@ -72,8 +74,15 @@ class ListVideoFragment : Fragment() {
                 viewModel.stateFlow.collect { result ->
                     binding.spinner.root.isVisible = result.isLoading
                     videoAdapter.submitList(result.listOfVideos)
+                    binding.errorDialog.root.isVisible = result.error != null
                 }
             }
+        }
+    }
+
+    private fun observerButton() {
+        binding.errorDialog.reloadButton.setOnClickListener {
+            viewModel.handleIntent(ReloadGetListOfVideos())
         }
     }
 }

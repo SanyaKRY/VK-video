@@ -14,6 +14,8 @@ import kreyer.my.util.vk_video.features.listvideo.domain.usecase.GetListOfVideos
 import kreyer.my.util.vk_video.features.listvideo.presentation.model.ListVideoScreenState
 import javax.inject.Inject
 import kreyer.my.util.vk_video.core.datatype.Result
+import kreyer.my.util.vk_video.features.listvideo.presentation.event.ListVideoScreenEvent
+import kreyer.my.util.vk_video.features.listvideo.presentation.event.ReloadGetListOfVideos
 import kreyer.my.util.vk_video.features.listvideo.presentation.model.VideoUi
 
 @HiltViewModel
@@ -30,8 +32,14 @@ class ListVideoViewModel @Inject constructor(
         getListOfVideos()
     }
 
+    fun handleIntent(event: ListVideoScreenEvent) {
+        when (event) {
+            is ReloadGetListOfVideos -> reloadGetListOfVideos()
+        }
+    }
+
     private fun getListOfVideos() {
-        viewModelScope.launch(Dispatchers.IO) {
+            viewModelScope.launch(Dispatchers.IO) {
             delay(2_000)
             val result: Result<List<VideoDomain>> = getListOfVideosUseCase.execute(PER_PAGE)
             withContext(Dispatchers.Main) {
@@ -59,6 +67,12 @@ class ListVideoViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun reloadGetListOfVideos() {
+        _stateFlow.value =
+            _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = true, error = null)
+        getListOfVideos()
     }
 
     companion object {
