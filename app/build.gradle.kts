@@ -35,7 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
-
+    buildFeatures {
+        viewBinding = true
+    }
     kapt {
         correctErrorTypes = true
     }
@@ -65,4 +67,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
 
+    implementation(libs.glide)
+
+    implementation(libs.recyclerview)
 }

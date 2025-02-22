@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ import kreyer.my.util.vk_video.features.listvideo.domain.usecase.GetListOfVideos
 import kreyer.my.util.vk_video.features.listvideo.presentation.model.ListVideoScreenState
 import javax.inject.Inject
 import kreyer.my.util.vk_video.core.datatype.Result
+import kreyer.my.util.vk_video.features.listvideo.presentation.model.VideoUi
 
 @HiltViewModel
 class ListVideoViewModel @Inject constructor(
@@ -30,14 +32,30 @@ class ListVideoViewModel @Inject constructor(
 
     private fun getListOfVideos() {
         viewModelScope.launch(Dispatchers.IO) {
+            delay(2_000)
             val result: Result<List<VideoDomain>> = getListOfVideosUseCase.execute(PER_PAGE)
             withContext(Dispatchers.Main) {
                 when (result) {
                     is Result.Success -> {
+                        _stateFlow.value = _stateFlow.value
+                            .copy(listOfVideos = result.data.map {
+                                VideoUi(
+                                    videoId = it.videoId,
+                                    videoDuration = it.videoDuration,
+                                    videoUrl = it.videoUrl,
+                                    videoName = it.videoName,
+                                    videoImage = it.videoImage
+                                )
+                            }, isLoading = false, error = null)
                     }
                     is Result.Error -> {
+                        _stateFlow.value =
+                            _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = false, error = result.error)
                     }
-                    Result.Loading -> {}
+                    Result.Loading -> {
+                        _stateFlow.value =
+                            _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = true, error = null)
+                    }
                 }
             }
         }

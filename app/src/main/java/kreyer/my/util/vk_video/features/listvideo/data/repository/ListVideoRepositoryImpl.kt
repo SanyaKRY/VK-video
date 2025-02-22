@@ -20,7 +20,11 @@ class ListVideoRepositoryImpl @Inject constructor(
                             videoId = it.videoId,
                             videoDuration = it.videoDuration,
                             videoUrl = it.videoUrl,
-                            videoName = it.videoUrl.split("/video/")[1].substringBeforeLast("-").replace("-", " "),
+                            videoName = it.videoUrl
+                                .split("/video/")[1]
+                                    .substringBeforeLast("-")
+                                    .replace("-", " ")
+                                    .replaceFirstChar { it.uppercase() },
                             videoImage = it.videoImage
                         )
                     }
