@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -53,4 +54,15 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    implementation(libs.lifecycle.viewmodel.ktx)
+
+    implementation(libs.moshi)
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    kapt(libs.moshi.kotlin.codegen)
+
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+
 }

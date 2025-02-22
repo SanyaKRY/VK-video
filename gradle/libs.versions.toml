@@ -14,6 +14,18 @@ constraintlayout = "2.2.0"
 hilt = "2.51.1"
 kotlin-kapt = "1.9.23"
 
+#lifecycle
+lifecycle = "2.8.7"
+
+#retrofit + moshi
+moshi = "1.15.1"
+retrofit = "2.9.0"
+converter-moshi = "2.9.0"
+
+#activity + fragment
+activity-ktx = "1.8.2"
+fragment-ktx = "1.6.2"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -27,6 +39,19 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 #hilt
 hilt-android = { group = "com.google.dagger", name = "hilt-android" , version.ref = "hilt"}
 hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler" , version.ref = "hilt"}
+
+#lifecycle
+lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+
+#retrofit + moshi
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converter-moshi" }
+moshi-kotlin-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
+
+#activity + fragment
+androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
