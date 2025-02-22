@@ -89,4 +89,9 @@ class ListVideoFragment : Fragment() {
             viewModel.handleIntent(ReloadGetListOfVideos())
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
