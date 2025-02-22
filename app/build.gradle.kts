@@ -70,4 +70,6 @@ dependencies {
     implementation(libs.glide)
 
     implementation(libs.recyclerview)
+
+    implementation(libs.androidx.swiperefreshlayout)
 }

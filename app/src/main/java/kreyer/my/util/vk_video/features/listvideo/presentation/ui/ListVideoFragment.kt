@@ -84,5 +84,9 @@ class ListVideoFragment : Fragment() {
         binding.errorDialog.reloadButton.setOnClickListener {
             viewModel.handleIntent(ReloadGetListOfVideos())
         }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            binding.swipeRefreshLayout.isRefreshing = false
+            viewModel.handleIntent(ReloadGetListOfVideos())
+        }
     }
 }
