@@ -1,5 +1,7 @@
 package kreyer.my.util.vk_video.features.videoplayer.presentation.vm
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -7,48 +9,37 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kreyer.my.util.vk_video.features.listvideo.presentation.model.VideoUi
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.VideoPlayerState
 import javax.inject.Inject
 
 @HiltViewModel
 class VideoPlayerViewModel @Inject constructor(
-    private val player: Player
 ) : ViewModel() {
 
-    fun getPlayer() = player
+    private val _isPlaying = MutableLiveData<Boolean>()
+    val isPlaying: LiveData<Boolean> = _isPlaying
 
-    private val _playerState = MutableStateFlow(VideoPlayerState())
-    val playerState: StateFlow<VideoPlayerState> = _playerState
+    private val _seekPosition = MutableLiveData<Long>()
+    val seekPosition: LiveData<Long> = _seekPosition
 
-    fun initializePlayer(videoUrl: String) {
-        player.apply {
-            setMediaItem(MediaItem.fromUri(videoUrl))
-            prepare()
-            play()
+    private val _videoUrl = MutableLiveData<String>()
+    val videoUrl: LiveData<String> = _videoUrl
 
-            addListener(object : Player.Listener {
-                override fun onPlaybackStateChanged(playbackState: Int) {
-                    _playerState.update {
-                        it.copy(
-                            isPlaying = isPlaying,
-                            isLoading = playbackState == Player.STATE_BUFFERING,
-                            duration = duration,
-                            position = currentPosition
-                        )
-                    }
-                }
-            })
-        }
+    fun setVideo(videoUi: VideoUi) {
+        _videoUrl.postValue(videoUi.videoUrl)
+        _isPlaying.postValue(true)
     }
 
     fun togglePlayback() {
-        if (player.isPlaying) player.pause() else player.play()
+        _isPlaying.value = !(isPlaying.value ?: true)
     }
 
-    fun seekForward() = player.seekForward()
-//    fun seekBackward() = player.seekBackward()
+    fun seekForward() {
+        _seekPosition.postValue(10_000L) // Перемотка на 10 секунд вперед
+    }
 
-    fun releasePlayer() {
-        player.release()
+    fun seekBackward() {
+        _seekPosition.postValue(-10_000L) // Перемотка на 10 секунд назад
     }
 }
