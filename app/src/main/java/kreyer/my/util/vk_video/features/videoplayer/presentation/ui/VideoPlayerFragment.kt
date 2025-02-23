@@ -1,22 +1,22 @@
 package kreyer.my.util.vk_video.features.videoplayer.presentation.ui
 
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import androidx.annotation.OptIn
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kreyer.my.util.vk_video.R
 import kreyer.my.util.vk_video.databinding.FragmentVideoPlayerBinding
+import kreyer.my.util.vk_video.features.listvideo.presentation.event.ReloadGetListOfVideos
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.PlayerIntent
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.VideoPlayerState
 import kreyer.my.util.vk_video.features.videoplayer.presentation.vm.VideoPlayerViewModel
@@ -43,14 +43,13 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         viewModel.getExoPlayer().stop()
         viewModel.processIntent(PlayerIntent.Initialize(args.video.videoUrl))
-
         setupPlayerView()
         setupControls()
         collectState()
         handleOrientationChanges()
+        setButton()
     }
 
     private fun setupPlayerView() {
@@ -58,31 +57,35 @@ class VideoPlayerFragment : Fragment() {
         binding.playerView.useController = false
     }
 
+    private fun setButton() {
+        binding.errorDialog.reloadButton.visibility = View.GONE
+    }
+
     private fun collectState() {
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.state.collect { state ->
-                when (state) {
-                    is VideoPlayerState.Loading -> {
-                        binding.spinner.root.isVisible = true
-                        binding.errorText.visibility = View.GONE
-
-                        binding.playerView.visibility = View.GONE
-                        binding.timeContainer.visibility = View.GONE
-                        binding.controllerContainer.visibility = View.GONE
-                    }
-                    is VideoPlayerState.Ready -> {
-                        binding.spinner.root.isVisible = false
-                        binding.errorText.visibility = View.GONE
-                        updateUI(state)
-                    }
-                    is VideoPlayerState.Error -> {
-                        binding.spinner.root.isVisible = false
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = state.message
-
-                        binding.playerView.visibility = View.GONE
-                        binding.timeContainer.visibility = View.GONE
-                        binding.controllerContainer.visibility = View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect { state ->
+                    when (state) {
+                        is VideoPlayerState.Loading -> {
+                            binding.spinner.root.isVisible = true
+                            binding.playerView.visibility = View.GONE
+                            binding.timeContainer.visibility = View.GONE
+                            binding.controllerContainer.visibility = View.GONE
+                        }
+                        is VideoPlayerState.Ready -> {
+                            binding.spinner.root.isVisible = false
+                            updateUI(state)
+                            binding.playerView.visibility = View.VISIBLE
+                            binding.timeContainer.visibility = View.VISIBLE
+                            binding.controllerContainer.visibility = View.VISIBLE
+                        }
+                        is VideoPlayerState.Error -> {
+                            binding.spinner.root.isVisible = false
+                            binding.errorDialog.root.isVisible = true
+                            binding.playerView.visibility = View.GONE
+                            binding.timeContainer.visibility = View.GONE
+                            binding.controllerContainer.visibility = View.GONE
+                        }
                     }
                 }
             }
@@ -97,14 +100,6 @@ class VideoPlayerFragment : Fragment() {
                 if (state.isPlaying) R.drawable.ic_pause else R.drawable.ic_play
             )
         }
-    }
-
-    private fun showLoading() {
-        // Показать индикатор загрузки
-    }
-
-    private fun showError(message: String) {
-        // Показать ошибку
     }
 
     private fun setupControls() {
@@ -125,7 +120,6 @@ class VideoPlayerFragment : Fragment() {
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
     }
 
-    // Сохраняем форматирование времени
     private fun formatTime(milliseconds: Long): String {
         val totalSeconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
         val minutes = totalSeconds / 60
@@ -141,7 +135,6 @@ class VideoPlayerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding.playerView.player = null
-//        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = null
     }
 }
