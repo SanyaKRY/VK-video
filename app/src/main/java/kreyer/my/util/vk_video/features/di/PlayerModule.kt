@@ -7,17 +7,17 @@ import androidx.media3.exoplayer.ExoPlayer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object PlayerModule {
 
     @OptIn(UnstableApi::class)
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideExoPlayer(
         @ApplicationContext context: Context
     ): ExoPlayer = ExoPlayer.Builder(context)

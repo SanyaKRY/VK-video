@@ -20,6 +20,7 @@ import kreyer.my.util.vk_video.databinding.FragmentVideoPlayerBinding
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.PlayerIntent
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.VideoPlayerState
 import kreyer.my.util.vk_video.features.videoplayer.presentation.vm.VideoPlayerViewModel
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class VideoPlayerFragment : Fragment() {
@@ -43,6 +44,7 @@ class VideoPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.getExoPlayer().stop()
         viewModel.processIntent(PlayerIntent.Initialize(args.video.videoUrl))
 
         setupPlayerView()
@@ -106,13 +108,21 @@ class VideoPlayerFragment : Fragment() {
 
     // Сохраняем форматирование времени
     private fun formatTime(milliseconds: Long): String {
-        // Ваш существующий код форматирования
-        return ""
+        val totalSeconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.getExoPlayer().pause()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding.playerView.player = null
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        _binding = null
     }
 }

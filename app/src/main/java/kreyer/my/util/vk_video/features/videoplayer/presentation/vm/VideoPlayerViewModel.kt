@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kreyer.my.util.vk_video.features.listvideo.presentation.model.VideoUi
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.PlayerIntent
@@ -39,7 +40,6 @@ class VideoPlayerViewModel @Inject constructor(
     private fun handleIntents() {
         viewModelScope.launch {
             intents.collect { intent ->
-                Log.d("123456adsfadf", "Intent: $intent")
                 when (intent) {
                     is PlayerIntent.Initialize -> initializePlayer(intent.videoUrl)
                     PlayerIntent.PlayPauseToggle -> togglePlayback()
@@ -51,30 +51,30 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     fun processIntent(intent: PlayerIntent) {
-        viewModelScope.launch {
-            intents.emit(intent)
+        if (viewModelScope.isActive) {
+            viewModelScope.launch {
+                intents.emit(intent)
+            }
         }
     }
 
     private fun initializePlayer(videoUrl: String) {
         try {
-            val mediaItem = MediaItem.fromUri(videoUrl)
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.prepare()
-            exoPlayer.play()
+            if (exoPlayer.playbackState == Player.STATE_IDLE) {
+                val mediaItem = MediaItem.fromUri(videoUrl)
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.prepare()
+                exoPlayer.play()
+            }
 
             exoPlayer.addListener(object : Player.Listener {
-                override fun onEvents(player: Player, events: Player.Events) {
-                    super.onEvents(player, events)
-                    updateState()
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    when (playbackState) {
+                        Player.STATE_READY -> updateState()
+                        Player.STATE_ENDED -> exoPlayer.seekTo(0)
+                    }
                 }
             })
-
-            _state.value = VideoPlayerState.Ready(
-                isPlaying = exoPlayer.isPlaying,
-                currentPosition = exoPlayer.currentPosition,
-                totalDuration = exoPlayer.duration
-            )
         } catch (e: Exception) {
             _state.value = VideoPlayerState.Error(e.message ?: "Unknown error")
         }
@@ -109,6 +109,7 @@ class VideoPlayerViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
+        exoPlayer.stop()
         exoPlayer.release()
     }
 }
