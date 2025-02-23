@@ -63,18 +63,26 @@ class VideoPlayerFragment : Fragment() {
             viewModel.state.collect { state ->
                 when (state) {
                     is VideoPlayerState.Loading -> {
-                        binding.loadingIndicator.visibility = View.VISIBLE
+                        binding.spinner.root.isVisible = true
                         binding.errorText.visibility = View.GONE
+
+                        binding.playerView.visibility = View.GONE
+                        binding.timeContainer.visibility = View.GONE
+                        binding.controllerContainer.visibility = View.GONE
                     }
                     is VideoPlayerState.Ready -> {
-                        binding.loadingIndicator.visibility = View.GONE
+                        binding.spinner.root.isVisible = false
                         binding.errorText.visibility = View.GONE
                         updateUI(state)
                     }
                     is VideoPlayerState.Error -> {
-                        binding.loadingIndicator.visibility = View.GONE
+                        binding.spinner.root.isVisible = false
                         binding.errorText.visibility = View.VISIBLE
                         binding.errorText.text = state.message
+
+                        binding.playerView.visibility = View.GONE
+                        binding.timeContainer.visibility = View.GONE
+                        binding.controllerContainer.visibility = View.GONE
                     }
                 }
             }
@@ -122,7 +130,7 @@ class VideoPlayerFragment : Fragment() {
         val totalSeconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
+        return "$minutes:$seconds"
     }
 
     override fun onPause() {
@@ -133,7 +141,7 @@ class VideoPlayerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding.playerView.player = null
-        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+//        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = null
     }
 }

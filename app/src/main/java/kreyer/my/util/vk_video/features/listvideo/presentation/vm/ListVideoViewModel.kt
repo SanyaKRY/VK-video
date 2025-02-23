@@ -76,6 +76,6 @@ class ListVideoViewModel @Inject constructor(
     }
 
     companion object {
-        const val PER_PAGE = 5
+        const val PER_PAGE = 10
     }
 }
