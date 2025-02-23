@@ -62,9 +62,20 @@ class VideoPlayerFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.state.collect { state ->
                 when (state) {
-                    is VideoPlayerState.Loading -> showLoading()
-                    is VideoPlayerState.Ready -> updateUI(state)
-                    is VideoPlayerState.Error -> showError(state.message)
+                    is VideoPlayerState.Loading -> {
+                        binding.loadingIndicator.visibility = View.VISIBLE
+                        binding.errorText.visibility = View.GONE
+                    }
+                    is VideoPlayerState.Ready -> {
+                        binding.loadingIndicator.visibility = View.GONE
+                        binding.errorText.visibility = View.GONE
+                        updateUI(state)
+                    }
+                    is VideoPlayerState.Error -> {
+                        binding.loadingIndicator.visibility = View.GONE
+                        binding.errorText.visibility = View.VISIBLE
+                        binding.errorText.text = state.message
+                    }
                 }
             }
         }

@@ -9,6 +9,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +27,8 @@ import javax.inject.Inject
 class VideoPlayerViewModel @Inject constructor(
     private val exoPlayer: ExoPlayer
 ) : ViewModel() {
+
+    private var updateJob: Job? = null
 
     fun getExoPlayer() = exoPlayer
 
@@ -70,13 +74,29 @@ class VideoPlayerViewModel @Inject constructor(
             exoPlayer.addListener(object : Player.Listener {
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     when (playbackState) {
-                        Player.STATE_READY -> updateState()
-                        Player.STATE_ENDED -> exoPlayer.seekTo(0)
+                        Player.STATE_READY -> {
+                            startPeriodicUpdate() // Запускаем обновление при готовности
+                            updateState()
+                        }
+                        Player.STATE_ENDED -> {
+                            exoPlayer.seekTo(0)
+                            updateState()
+                        }
                     }
                 }
             })
         } catch (e: Exception) {
             _state.value = VideoPlayerState.Error(e.message ?: "Unknown error")
+        }
+    }
+
+    private fun startPeriodicUpdate() {
+        updateJob?.cancel() // Отменяем предыдущую корутину
+        updateJob = viewModelScope.launch {
+            while (true) {
+                delay(1000L) // Обновляем каждую секунду
+                updateState()
+            }
         }
     }
 
@@ -108,8 +128,9 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
+        updateJob?.cancel() // Отменяем корутину при очистке
         exoPlayer.stop()
         exoPlayer.release()
+        super.onCleared()
     }
 }
