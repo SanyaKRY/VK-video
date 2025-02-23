@@ -22,10 +22,10 @@ class MainActivity : AppCompatActivity() {
 //            insets
 //        }
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.main, ListVideoFragment())
-                .commit()
-        }
+//        if (savedInstanceState == null) {
+//            supportFragmentManager.beginTransaction()
+//                .add(R.id.main, ListVideoFragment())
+//                .commit()
+//        }
     }
 }

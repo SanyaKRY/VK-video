@@ -19,7 +19,7 @@ class ListVideoRepositoryImpl @Inject constructor(
                         VideoDomain(
                             videoId = it.videoId,
                             videoDuration = it.videoDuration,
-                            videoUrl = it.videoUrl,
+                            videoUrl = it.videoFiles.first().link,
                             videoName = it.videoUrl
                                 .split("/video/")[1]
                                     .substringBeforeLast("-")

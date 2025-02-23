@@ -1,7 +1,6 @@
 package kreyer.my.util.vk_video.features.listvideo.presentation.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +37,9 @@ class ListVideoFragment : Fragment() {
         videoUi: VideoUi
     ) -> Unit = {
             videoUi ->
-        Log.d("CatTag", "Click on $videoUi")
+        val action = ListVideoFragmentDirections
+            .actionListVideoFragmentToVideoPlayerFragment(videoUi)
+        findNavController().navigate(action)
     }
 
     private lateinit var videoAdapter: VideoAdapter
