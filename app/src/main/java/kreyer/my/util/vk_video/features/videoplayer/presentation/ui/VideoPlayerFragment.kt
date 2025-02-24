@@ -16,7 +16,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import kreyer.my.util.vk_video.R
 import kreyer.my.util.vk_video.databinding.FragmentVideoPlayerBinding
-import kreyer.my.util.vk_video.features.listvideo.presentation.event.ReloadGetListOfVideos
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.PlayerIntent
 import kreyer.my.util.vk_video.features.videoplayer.presentation.model.VideoPlayerState
 import kreyer.my.util.vk_video.features.videoplayer.presentation.vm.VideoPlayerViewModel
