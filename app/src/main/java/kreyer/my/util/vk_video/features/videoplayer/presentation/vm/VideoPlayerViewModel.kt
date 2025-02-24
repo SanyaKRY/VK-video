@@ -89,7 +89,8 @@ class VideoPlayerViewModel @Inject constructor(
         }
     }
 
-    fun getExoPlayer() = exoPlayer
+    val player: ExoPlayer
+        get() = exoPlayer
 
     private fun startTimeoutTimer() {
         timeoutJob?.cancel()
