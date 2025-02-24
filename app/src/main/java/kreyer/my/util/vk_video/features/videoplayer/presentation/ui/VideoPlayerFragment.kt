@@ -42,7 +42,7 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getExoPlayer().stop()
+        viewModel.player.stop()
         viewModel.processIntent(PlayerIntent.Initialize(args.video.videoUrl))
         setupPlayerView()
         setupControls()
@@ -52,7 +52,7 @@ class VideoPlayerFragment : Fragment() {
     }
 
     private fun setupPlayerView() {
-        binding.playerView.player = viewModel.getExoPlayer()
+        binding.playerView.player = viewModel.player
         binding.playerView.useController = false
     }
 
@@ -128,7 +128,7 @@ class VideoPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.getExoPlayer().pause()
+        viewModel.player.pause()
     }
 
     override fun onDestroyView() {
