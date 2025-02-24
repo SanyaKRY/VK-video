@@ -6,6 +6,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
@@ -57,7 +58,7 @@ class ListVideoViewModelTest {
                 videoImage = "image1"
             )
         )
-        coEvery { mockUseCase.execute(any()) } returns Result.Success(testVideos)
+        coEvery { mockUseCase.execute(any()) } returns flowOf(Result.Success(testVideos))
         viewModel = ListVideoViewModel(mockUseCase)
         viewModel.stateFlow.test {
             assertTrue(awaitItem().isLoading)
@@ -75,7 +76,7 @@ class ListVideoViewModelTest {
     @Test
     fun `Test get error result`() = runTest {
         val testError = IOException("Network error")
-        coEvery { mockUseCase.execute(any()) } returns Result.Error(testError)
+        coEvery { mockUseCase.execute(any()) } returns flowOf(Result.Error(testError))
         viewModel = ListVideoViewModel(mockUseCase)
         viewModel.stateFlow.test {
             assertTrue(awaitItem().isLoading)
@@ -89,7 +90,7 @@ class ListVideoViewModelTest {
 
     @Test
     fun `Test get loading result`() = runTest {
-        coEvery { mockUseCase.execute(any()) } returns Result.Loading
+        coEvery { mockUseCase.execute(any()) } returns flowOf(Result.Loading)
         viewModel = ListVideoViewModel(mockUseCase)
         viewModel.stateFlow.test {
             val initialState = awaitItem()
@@ -107,7 +108,7 @@ class ListVideoViewModelTest {
             videoName = "domain-video",
             videoImage = "domain-image"
         )
-        coEvery { mockUseCase.execute(any()) } returns Result.Success(listOf(testDomain))
+        coEvery { mockUseCase.execute(any()) } returns flowOf(Result.Success(listOf(testDomain)))
         viewModel = ListVideoViewModel(mockUseCase)
         viewModel.stateFlow.test {
             awaitItem()

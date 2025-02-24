@@ -8,8 +8,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kreyer.my.util.vk_video.features.listvideo.domain.model.VideoDomain
 import kreyer.my.util.vk_video.features.listvideo.domain.usecase.GetListOfVideosUseCase
 import kreyer.my.util.vk_video.features.listvideo.presentation.model.ListVideoScreenState
 import javax.inject.Inject
@@ -41,31 +39,56 @@ class ListVideoViewModel @Inject constructor(
     private fun getListOfVideos() {
             viewModelScope.launch(Dispatchers.IO) {
             delay(2_000)
-            val result: Result<List<VideoDomain>> = getListOfVideosUseCase.execute(PER_PAGE)
-            withContext(Dispatchers.Main) {
-                when (result) {
-                    is Result.Success -> {
-                        _stateFlow.value = _stateFlow.value
-                            .copy(listOfVideos = result.data.map {
-                                VideoUi(
-                                    videoId = it.videoId,
-                                    videoDuration = it.videoDuration,
-                                    videoUrl = it.videoUrl,
-                                    videoName = it.videoName,
-                                    videoImage = it.videoImage
-                                )
-                            }, isLoading = false, error = null)
-                    }
-                    is Result.Error -> {
-                        _stateFlow.value =
-                            _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = false, error = result.error)
-                    }
-                    Result.Loading -> {
-                        _stateFlow.value =
-                            _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = true, error = null)
+                getListOfVideosUseCase.execute(PER_PAGE).collect { result ->
+                    when (result) {
+                        is Result.Success -> {
+                            _stateFlow.value = _stateFlow.value
+                                .copy(listOfVideos = result.data.map {
+                                    VideoUi(
+                                        videoId = it.videoId,
+                                        videoDuration = it.videoDuration,
+                                        videoUrl = it.videoUrl,
+                                        videoName = it.videoName,
+                                        videoImage = it.videoImage
+                                    )
+                                }, isLoading = false, error = null)
+                        }
+                        is Result.Error -> {
+                            _stateFlow.value =
+                                _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = false, error = result.error)
+                        }
+                        Result.Loading -> {
+                            _stateFlow.value =
+                                _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = true, error = null)
+                        }
                     }
                 }
-            }
+//            withContext(Dispatchers.Main) {
+//                flow.map { result ->
+//                    when (result) {
+//                        is Result.Success -> {
+//                            _stateFlow.value = _stateFlow.value
+//                                .copy(listOfVideos = result.data.map {
+//                                    VideoUi(
+//                                        videoId = it.videoId,
+//                                        videoDuration = it.videoDuration,
+//                                        videoUrl = it.videoUrl,
+//                                        videoName = it.videoName,
+//                                        videoImage = it.videoImage
+//                                    )
+//                                }, isLoading = false, error = null)
+//                        }
+//                        is Result.Error -> {
+//                            _stateFlow.value =
+//                                _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = false, error = result.error)
+//                        }
+//                        Result.Loading -> {
+//                            _stateFlow.value =
+//                                _stateFlow.value.copy(listOfVideos = emptyList(), isLoading = true, error = null)
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 
